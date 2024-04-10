@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="PixelSurvival_DevTool:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/PixelSurvival_DevTool_jar</output-path>
+    <root id="archive" name="PixelSurvival_DevTool.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/out/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="PixelSurvival_DevTool" />
+      <element id="extracted-dir" path="$USER_HOME$/Desktop/processing-4.0-windows-x64/processing-4.0/core/processingLib/core.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Desktop/processing-4.0-windows-x64/processing-4.0/core/processingLib/jogl-all.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Desktop/processing-4.0-windows-x64/processing-4.0/core/processingLib/gluegen-rt.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
