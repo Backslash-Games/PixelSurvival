@@ -1,4 +1,9 @@
+package Tiles.Solid;
+
 import java.util.Random;
+import System.Program;
+import Function.Math.Point;
+import Tiles.Tile;
 
 public class Soil extends Tile {
     @Override
@@ -31,7 +36,7 @@ public class Soil extends Tile {
             while(movementCheck < 2) {
                 // -> Move left
                 if (tilePoint.X - 1 >= 0 && !tiles[tilePoint.X - 1][tilePoint.Y + 1].isSolid &&
-                        (!tiles[tilePoint.X - 1][tilePoint.Y].isSolid || tiles[tilePoint.X][tilePoint.Y + 1].tileName == "Sand")
+                        (!tiles[tilePoint.X - 1][tilePoint.Y].isSolid || tiles[tilePoint.X][tilePoint.Y + 1].tileName == "Tiles.Solid.Sand")
                         && moveLeft) {
                     Program.gm.SwapTiles(tilePoint, new Point(tilePoint.X - 1, tilePoint.Y + 1));
                     updated = true;
@@ -40,7 +45,7 @@ public class Soil extends Tile {
                 }
                 // -> Move Right
                 if (tilePoint.X + 1 < tiles.length && !tiles[tilePoint.X + 1][tilePoint.Y + 1].isSolid &&
-                        (!tiles[tilePoint.X + 1][tilePoint.Y].isSolid || tiles[tilePoint.X][tilePoint.Y + 1].tileName == "Sand")
+                        (!tiles[tilePoint.X + 1][tilePoint.Y].isSolid || tiles[tilePoint.X][tilePoint.Y + 1].tileName == "Tiles.Solid.Sand")
                         && !moveLeft) {
                     Program.gm.SwapTiles(tilePoint, new Point(tilePoint.X + 1, tilePoint.Y + 1));
                     updated = true;

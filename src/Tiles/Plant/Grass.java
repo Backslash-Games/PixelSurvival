@@ -1,6 +1,10 @@
-import com.sun.source.tree.PackageTree;
+package Tiles.Plant;
 
 import java.util.Random;
+import Function.Graphics.Color;
+import Function.Math.Point;
+import System.Program;
+import Tiles.Tile;
 
 public class Grass extends Plant {
 
@@ -12,12 +16,15 @@ public class Grass extends Plant {
     public Grass()
     {
         tileName = "Grass";
-        tileColor = new Color(59, 181, 53);
+        tileColor = new Color(59, 181, 53, 255, 30);
 
         Random rand = new Random();
-        upValue = rand.nextInt(4);
-        downValue = rand.nextInt(3) + 1;
+        upValue = rand.nextInt(5);
+        downValue = rand.nextInt(3) + 3;
 
+        health = 100;
+        flammable = true;
+        flammableChance = 10;
         hasGravity = true;
     }
 
@@ -52,34 +59,34 @@ public class Grass extends Plant {
             }
             // --> Check for build up out
             if (Program.gm.PointInBounds(new Point(tilePoint.X - 1, tilePoint.Y - 1))) {
-                if (cTiles[tilePoint.X - 1][tilePoint.Y].tileName == "Dirt" && cTiles[tilePoint.X - 1][tilePoint.Y - 1].tileName == "Air") {
+                if (cTiles[tilePoint.X - 1][tilePoint.Y].tileName == "Dirt" && cTiles[tilePoint.X - 1][tilePoint.Y - 1].tileName == "Tiles.Gas.Air") {
                     Program.gm.PlaceTile(tilePoint.X - 1, tilePoint.Y - 1, new Grass());
                 }
             }
             if (Program.gm.PointInBounds(new Point(tilePoint.X + 1, tilePoint.Y - 1))) {
-                if (cTiles[tilePoint.X + 1][tilePoint.Y].tileName == "Dirt" && cTiles[tilePoint.X + 1][tilePoint.Y - 1].tileName == "Air") {
+                if (cTiles[tilePoint.X + 1][tilePoint.Y].tileName == "Dirt" && cTiles[tilePoint.X + 1][tilePoint.Y - 1].tileName == "Tiles.Gas.Air") {
                     Program.gm.PlaceTile(tilePoint.X + 1, tilePoint.Y - 1, new Grass());
                 }
             }
             // --> Check for build out
             if (Program.gm.PointInBounds(new Point(tilePoint.X - 1, tilePoint.Y + 1))) {
-                if (cTiles[tilePoint.X - 1][tilePoint.Y + 1].tileName == "Dirt" && cTiles[tilePoint.X - 1][tilePoint.Y].tileName == "Air") {
+                if (cTiles[tilePoint.X - 1][tilePoint.Y + 1].tileName == "Dirt" && cTiles[tilePoint.X - 1][tilePoint.Y].tileName == "Tiles.Gas.Air") {
                     Program.gm.PlaceTile(tilePoint.X - 1, tilePoint.Y, new Grass());
                 }
             }
             if (Program.gm.PointInBounds(new Point(tilePoint.X + 1, tilePoint.Y + 1))) {
-                if (cTiles[tilePoint.X + 1][tilePoint.Y + 1].tileName == "Dirt" && cTiles[tilePoint.X + 1][tilePoint.Y].tileName == "Air") {
+                if (cTiles[tilePoint.X + 1][tilePoint.Y + 1].tileName == "Dirt" && cTiles[tilePoint.X + 1][tilePoint.Y].tileName == "Tiles.Gas.Air") {
                     Program.gm.PlaceTile(tilePoint.X + 1, tilePoint.Y, new Grass());
                 }
             }
             // --> Check for build down out
             if (Program.gm.PointInBounds(new Point(tilePoint.X - 1, tilePoint.Y + 2))) {
-                if (cTiles[tilePoint.X - 1][tilePoint.Y + 2].tileName == "Dirt" && cTiles[tilePoint.X - 1][tilePoint.Y + 1].tileName == "Air") {
+                if (cTiles[tilePoint.X - 1][tilePoint.Y + 2].tileName == "Dirt" && cTiles[tilePoint.X - 1][tilePoint.Y + 1].tileName == "Tiles.Gas.Air") {
                     Program.gm.PlaceTile(tilePoint.X - 1, tilePoint.Y + 1, new Grass());
                 }
             }
             if (Program.gm.PointInBounds(new Point(tilePoint.X + 1, tilePoint.Y + 2))) {
-                if (cTiles[tilePoint.X + 1][tilePoint.Y + 2].tileName == "Dirt" && cTiles[tilePoint.X + 1][tilePoint.Y + 1].tileName == "Air") {
+                if (cTiles[tilePoint.X + 1][tilePoint.Y + 2].tileName == "Dirt" && cTiles[tilePoint.X + 1][tilePoint.Y + 1].tileName == "Tiles.Gas.Air") {
                     Program.gm.PlaceTile(tilePoint.X + 1, tilePoint.Y + 1, new Grass());
                 }
             }

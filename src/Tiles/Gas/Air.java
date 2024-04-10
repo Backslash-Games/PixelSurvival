@@ -1,6 +1,10 @@
+package Tiles.Gas;
+
+import Function.Graphics.Color;
+import Tiles.Tile;
 import com.sun.source.tree.PackageTree;
 
-class Air extends Tile
+public class Air extends Tile
 {
     public int dirtDist = 0;
 
@@ -11,6 +15,8 @@ class Air extends Tile
         hasGravity = false;
         stationary = true;
         isSolid = false;
+        invulnerable = true;
+        density = -1;
     }
 
     public void UpdateAtmosphere() {
@@ -25,10 +31,10 @@ class Air extends Tile
 
     @Override
     public String toString() {
-        return  "\nColor: " + tileColor.toString() +
+        return  "\nFunction.Graphics.Color: " + tileColor.toString() +
                 "\nPosition: " + tilePoint.toString() +
                 "\nSolid: " + isSolid +
                 "\nGravity: " + hasGravity +
-                "\nDirt Distance: " + dirtDist;
+                "\nTiles.Solid.Dirt Distance: " + dirtDist;
     }
 }

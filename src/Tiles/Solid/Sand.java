@@ -1,6 +1,7 @@
-import java.util.Random;
+package Tiles.Solid;
 
-class Sand extends Soil
+import Function.Graphics.Color;
+public class Sand extends Soil
 {
         public Sand()
         {

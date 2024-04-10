@@ -1,7 +1,13 @@
-import java.util.ArrayList;
+package Tiles.Plant;
+
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
+
+import Function.Math.Point;
+import System.Program;
+import Function.Graphics.Color;
+import Tiles.Solid.Wood;
 
 public class Sapling extends Plant{
     class Branch implements Comparable<Branch>

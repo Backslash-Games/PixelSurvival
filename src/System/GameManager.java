@@ -1,9 +1,24 @@
-import java.util.Random;
+package System;
+
+import Function.Math.Point;
+import Function.Math.Random;
+import Tiles.*;
+import Tiles.Effect.Fire;
+import Tiles.Gas.Air;
+import Tiles.Gas.Gas;
+import Tiles.Liquid.Acid;
+import Tiles.Liquid.Lava;
+import Tiles.Liquid.Water;
+import Tiles.Plant.Grass;
+import Tiles.Plant.Sapling;
+import Tiles.Solid.*;
 
 public class GameManager
 {
     public Tile[][] tiles;
     public int updateTimes = 0;
+
+    boolean paused = false;
 
     public GameManager()
     {
@@ -41,8 +56,23 @@ public class GameManager
         PlaceTile(end.X, end.Y, holdTile);
     }
 
+    // N, E, S, W
+    public Tile[] PullTouchingTiles(Point tilePoint){
+        Tile[] returnTiles = new Tile[4];
+
+        returnTiles[0] = GetTile(new Point(tilePoint.X, tilePoint.Y - 1));
+        returnTiles[1] = GetTile(new Point(tilePoint.X + 1, tilePoint.Y));
+        returnTiles[2] = GetTile(new Point(tilePoint.X, tilePoint.Y + 1));
+        returnTiles[3] = GetTile(new Point(tilePoint.X - 1, tilePoint.Y));
+
+        return returnTiles;
+    }
+
     public void UpdateTiles()
     {
+        if(paused)
+            return;
+
         for (int x = 0; x < tiles.length; x++)
         {
             for (int y = 0; y < tiles[0].length; y++)
@@ -93,6 +123,20 @@ public class GameManager
                 return new Sapling();
             case "wood":
                 return new Wood();
+            case "fire":
+                return new Fire();
+            case "lava":
+                return new Lava();
+            case "acid":
+                return new Acid();
+            case "stone":
+                return new Stone();
+            case "godrock":
+                return new Godrock();
+            case "gas":
+                return new Gas();
+            case "fuse":
+                return new Fuse();
             default:
                 return new Tile();
         }
@@ -123,9 +167,6 @@ public class GameManager
     }
     void BuildWorld()
     {
-        Random rand = new Random();
-        int rng = rand.nextInt(5);
-
         // Set air
         for(int x = 0; x < tiles.length;  x++) {
             for(int y = 0; y < tiles[0].length;  y++) {
@@ -136,20 +177,36 @@ public class GameManager
 
 
         // Build dirt
+        float height = 0;
         for(int x = 0; x < tiles.length;  x++)
         {
-            int inc = rand.nextInt(3) - 1;
-            inc = Math.min(1, inc);
+            height += Random.Range(-1000, 1000) / 1000f;
+            int modHeight = Math.round(height);
 
-            rng = Math.max(-5, rng + inc);
-            for(int y = tiles[0].length - 1; y >= tiles[0].length - 10 - rng; y--)
+            int l1 = tiles[0].length - 10 - modHeight;
+            int l2 = tiles[0].length - 25 - (modHeight * 2);
+            int l3 = tiles[0].length - 50 - (modHeight * 3);
+
+            // -> Bedrock
+            for(int y = tiles[0].length - 1; y >= l1; y--)
+                PlaceTile(x, y, new Bedrock());
+            // -> Stone
+            for(int y = l1 - 1; y >= l2; y--)
+                PlaceTile(x, y, new Stone());
+            // -> Dirt
+            for(int y = l2 - 1; y >= l3; y--)
             {
                 PlaceTile(x, y, new Dirt());
 
-                if(y == tiles[0].length - 10 - rng){
+                if(y == l3){
                     PlaceTile(x, y - 1, new Grass());
                 }
             }
         }
+    }
+
+
+    public void TogglePlaytime(){
+        paused = !paused;
     }
 }

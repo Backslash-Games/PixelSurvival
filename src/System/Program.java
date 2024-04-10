@@ -1,3 +1,11 @@
+package System;
+
+import Debug.Console;
+import Function.Graphics.Color;
+import Function.Graphics.PowderButton;
+import Function.Math.Point;
+import Tiles.Gas.Air;
+import Tiles.Tile;
 import processing.core.PApplet;
 import processing.core.PImage;
 
@@ -11,26 +19,39 @@ public class Program extends PApplet {
 
     public static int screenWidth = 1200;
     public static int screenHeight = 900;
-    public static int pixelSize = 10;
+    public static int pixelSize = 5;
 
     public static boolean drawDebug = false;
 
     public int selectedPen = 0;
-    public String[] penTypes = { "Air", "Bedrock", "Sand", "Dirt", "Water", "Grass", "Sapling", "Wood"};
+    public String[] penTypes = { "Air", "Godrock", "Sand", "Dirt", "Water", "Grass", "Sapling", "Wood",
+            "Fire", "Lava", "Acid", "Stone", "Bedrock", "Gas", "Fuse"};
 
     public PowderButton[] buttons;
 
     PImage menuImage;
     List<Integer> uXvals = new ArrayList<>();
 
+    String consoleTag = "PROGRAM";
+
+    // Sets window settings
     public void settings(){
+        Console.out(consoleTag, Console.GREEN, "Enforcing settings");
+        Console.out(consoleTag, Console.GREEN, "Width - " + (screenWidth + 500) + " | Height - " + screenHeight);
+        Console.out(consoleTag, Console.GREEN, "Pixel Size - " + pixelSize);
+        Console.out(consoleTag, Console.GREEN, "No smoothing");
+
+
         size(screenWidth + 500,screenHeight);
         pixelWidth = pixelSize;
         noSmooth();
     }
 
+    // Setup the window
     public void setup()
     {
+        Console.out(consoleTag, Console.GREEN, "Setting up window");
+
         gm = new GameManager();
         instance = this;
 
@@ -50,10 +71,11 @@ public class Program extends PApplet {
         }
 
         noStroke();
+        Console.out(consoleTag, Console.GREEN, "Starting loop");
         loop();
     }
 
-
+    // Draw the window
     public void draw()
     {
         // Update loop
@@ -65,8 +87,6 @@ public class Program extends PApplet {
         // Update Atmosphere
         int lowestDirtY = 0;
         for(int i = 0; i < uXvals.size(); i++){
-            if(i == 0)
-                System.out.println(uXvals.size());
             int x = uXvals.get(i);
 
             Tile cTile;
@@ -89,12 +109,6 @@ public class Program extends PApplet {
                     air.UpdateAtmosphere();
                 }
             }
-        }
-        // Print out uXVals
-        for(int i = 0; i < uXvals.size(); i++){
-            System.out.print((uXvals.get(i) / pixelSize) + ", ");
-            if(i == uXvals.size() - 1)
-                System.out.println();
         }
         // Set pointer for the x values updated
         uXvals.clear();
@@ -139,7 +153,7 @@ public class Program extends PApplet {
 
 
         // Draw menu image
-        image(menuImage, screenWidth, 0, menuImage.width * pixelSize, menuImage.height * pixelSize);
+        image(menuImage, screenWidth, 0, menuImage.width * 10, menuImage.height * 10);
         Tile hoverTile = gm.GetTile(gm.ScreenToWorld(new Point(mouseX, mouseY)));
         String stateText = "Hovering";
         if(hoverTile == null)
@@ -208,24 +222,74 @@ public class Program extends PApplet {
 
     @Override
     public void keyPressed() {
+        Console.out("INPUT", Console.RED, "Key pressed '" + key + "'");
         if(key == ' '){
             CyclePenType();
+        }
+        if(key == 'q' && gm != null){
+            gm.TogglePlaytime();
+        }
+        switch (key){
+            case '1':
+                ChangePenSize(0);
+                break;
+            case '2':
+                ChangePenSize(1);
+                break;
+            case '3':
+                ChangePenSize(2);
+                break;
+            case '4':
+                ChangePenSize(3);
+                break;
+            case '5':
+                ChangePenSize(4);
+                break;
+            case '6':
+                ChangePenSize(5);
+                break;
+            case '7':
+                ChangePenSize(6);
+                break;
+            case '8':
+                ChangePenSize(7);
+                break;
+            case '9':
+                ChangePenSize(8);
+                break;
+            case '0':
+                ChangePenSize(9);
+                break;
         }
     }
 
     public static void main(String[] args) {
-        PApplet.main("Program");
+        PApplet.main("System.Program");
     }
 
 
 
+    int penSize = 0;
+    public void ChangePenSize(int size){
+        penSize = size;
+    }
     public void PaintTile(){
         // -> Get location of mouse
         Point mousePos = gm.ScreenToWorld(new Point(mouseX, mouseY));
-        // -> Check if the location is air
-        Tile cTile = gm.GetTile(mousePos);
-        if(cTile != null && (cTile.tileName == "Air" || penTypes[selectedPen] == "Air")){
-            gm.PlaceTile(mousePos, gm.TileFromName(penTypes[selectedPen]));
+
+        Point pSize = new Point(penSize, penSize);
+
+        for(int x = -pSize.X; x <= pSize.X; x++){
+            for(int y = -pSize.Y; y <= pSize.Y; y++){
+                Point mPos = Point.add(mousePos, new Point(x, y));
+                Tile pTile = gm.TileFromName(penTypes[selectedPen]);
+                // -> Check if the location is air
+                Tile cTile = gm.GetTile(mPos);
+                if(cTile != null && (cTile.tileName == "Air" || penTypes[selectedPen] == "Air")){
+                    gm.PlaceTile(mPos, pTile);
+                }
+                Console.out(consoleTag, Console.GREEN, "Painting at " + mPos + " | " + mousePos);
+            }
         }
     }
     public void CyclePenType(){

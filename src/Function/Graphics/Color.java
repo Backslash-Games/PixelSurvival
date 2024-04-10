@@ -1,3 +1,7 @@
+package Function.Graphics;
+
+import Function.Math.Random;
+
 public class Color
 {
     public int r = 255;
@@ -12,9 +16,14 @@ public class Color
         this.b = b;
     }
     public Color(int r, int g, int b, int a){
-        this.r = r;
-        this.g = g;
-        this.b = b;
+        this(r, g, b);
+        this.a = a;
+    }
+    public Color(int r, int g, int b, int a, int variation){
+        int shift = Random.Range(-variation, variation);
+        this.r = r + shift;
+        this.g = g + shift;
+        this.b = b + shift;
         this.a = a;
     }
 
