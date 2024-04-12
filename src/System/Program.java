@@ -38,6 +38,12 @@ public class Program extends PApplet {
     // Sets window settings
     public void settings(){
         Console.out(consoleTag, Console.GREEN, "Enforcing settings");
+
+        // Create game manager - for system information
+        gm = new GameManager();
+        /*screenWidth = gm.sysInfo.screenSize.X - 500;
+        screenHeight = gm.sysInfo.screenSize.Y;*/
+
         Console.out(consoleTag, Console.GREEN, "Width - " + (screenWidth + 500) + " | Height - " + screenHeight);
         Console.out(consoleTag, Console.GREEN, "Pixel Size - " + pixelSize);
         Console.out(consoleTag, Console.GREEN, "No smoothing");
@@ -53,7 +59,6 @@ public class Program extends PApplet {
     {
         Console.out(consoleTag, Console.GREEN, "Setting up window");
 
-        gm = new GameManager();
         instance = this;
 
         menuImage = loadImage("TileDisplay.png");

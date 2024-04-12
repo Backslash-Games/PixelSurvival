@@ -20,6 +20,7 @@ public class Console {
     public static boolean writeDraw = false;
     public static boolean writeKeypress = false;
     public static boolean writeButtonCreation = false;
+    public static boolean writeSysInfo = true;
 
     public static String Format(String text, String colorCode){
         return colorCode + "[" + text + "]" + ANSI_RESET;

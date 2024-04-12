@@ -17,11 +17,15 @@ public class GameManager
 {
     public Tile[][] tiles;
     public int updateTimes = 0;
-
+    public static Information sysInfo = null;
     boolean paused = false;
 
     public GameManager()
     {
+        // -> Create system information
+        if(sysInfo == null)
+            sysInfo = new Information();
+
         // -> On start it will initialize the game
         tiles = new Tile[Program.screenWidth / Program.pixelSize][Program.screenHeight / Program.pixelSize];
 
