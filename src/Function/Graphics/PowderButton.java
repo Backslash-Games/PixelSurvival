@@ -16,7 +16,8 @@ public class PowderButton extends Button {
 
         id = powderID;
 
-        Console.out(consoleTag, Console.PURPLE, "Logged with id " + id);
+        if(Console.writeButtonCreation)
+            Console.out(consoleTag, Console.PURPLE, "Logged with id " + id);
     }
     @Override
     public void OnClicked() {

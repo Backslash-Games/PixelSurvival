@@ -32,7 +32,8 @@ public class Program extends PApplet {
     PImage menuImage;
     List<Integer> uXvals = new ArrayList<>();
 
-    String consoleTag = "PROGRAM";
+    // Console information
+    static String consoleTag = "PROGRAM";
 
     // Sets window settings
     public void settings(){
@@ -222,7 +223,8 @@ public class Program extends PApplet {
 
     @Override
     public void keyPressed() {
-        Console.out("INPUT", Console.RED, "Key pressed '" + key + "'");
+        if(Console.writeKeypress)
+            Console.out("INPUT", Console.RED, "Key pressed '" + key + "'");
         if(key == ' '){
             CyclePenType();
         }
@@ -288,7 +290,8 @@ public class Program extends PApplet {
                 if(cTile != null && (cTile.tileName == "Air" || penTypes[selectedPen] == "Air")){
                     gm.PlaceTile(mPos, pTile);
                 }
-                Console.out(consoleTag, Console.GREEN, "Painting at " + mPos + " | " + mousePos);
+                if(Console.writeDraw)
+                    Console.out(consoleTag, Console.GREEN, "Painting at " + mPos + " | " + mousePos);
             }
         }
     }

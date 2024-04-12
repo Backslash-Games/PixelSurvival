@@ -14,7 +14,8 @@ public class Button {
         origin = new Point(x, y);
         size = new Point(width, height);
 
-        Console.out(consoleTag, Console.CYAN, "Creating button at " + origin + " with size " + size);
+        if(Console.writeButtonCreation)
+            Console.out(consoleTag, Console.CYAN, "Creating button at " + origin + " with size " + size);
     }
 
     // Checks if the position on screen is inside the button
