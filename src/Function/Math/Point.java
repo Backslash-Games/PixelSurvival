@@ -5,6 +5,8 @@ public class Point implements Comparable<Point>
     public int X = 0;
     public int Y = 0;
 
+    public static Point up = new Point(0, -1);
+
     public Point(int x, int y){
         X = x;
         Y = y;

@@ -9,6 +9,7 @@ import Tiles.Gas.Gas;
 import Tiles.Liquid.Acid;
 import Tiles.Liquid.Lava;
 import Tiles.Liquid.Water;
+import Tiles.Object.Torch;
 import Tiles.Plant.Grass;
 import Tiles.Plant.Sapling;
 import Tiles.Solid.*;
@@ -20,8 +21,15 @@ public class GameManager
     public static Information sysInfo = null;
     boolean paused = false;
 
+    public static GameManager Instance = null;
+
     public GameManager()
     {
+        if(Instance != null)
+            return;
+        Instance = this;
+
+
         // -> Create system information
         if(sysInfo == null)
             sysInfo = new Information();
@@ -141,6 +149,8 @@ public class GameManager
                 return new Gas();
             case "fuse":
                 return new Fuse();
+            case "torch":
+                return new Torch();
             default:
                 return new Tile();
         }

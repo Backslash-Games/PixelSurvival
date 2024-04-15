@@ -25,7 +25,7 @@ public class Program extends PApplet {
 
     public int selectedPen = 0;
     public String[] penTypes = { "Air", "Godrock", "Sand", "Dirt", "Water", "Grass", "Sapling", "Wood",
-            "Fire", "Lava", "Acid", "Stone", "Bedrock", "Gas", "Fuse"};
+            "Fire", "Lava", "Acid", "Stone", "Bedrock", "Gas", "Fuse", "Torch"};
 
     public PowderButton[] buttons;
 
@@ -41,11 +41,14 @@ public class Program extends PApplet {
 
         // Create game manager - for system information
         gm = new GameManager();
-        /*screenWidth = gm.sysInfo.screenSize.X - 500;
-        screenHeight = gm.sysInfo.screenSize.Y;*/
+        int simulationSize = Math.min(gm.sysInfo.screenSize.X, gm.sysInfo.screenSize.Y);
+        int simulationEdgeBuffer = simulationSize / 10;
+        screenWidth = screenHeight = simulationSize - simulationEdgeBuffer;
 
         Console.out(consoleTag, Console.GREEN, "Width - " + (screenWidth + 500) + " | Height - " + screenHeight);
         Console.out(consoleTag, Console.GREEN, "Pixel Size - " + pixelSize);
+        Console.out(consoleTag, Console.GREEN, "Sim.W - " + (screenWidth / pixelSize) +
+                " | Sim.H - " + (screenHeight / pixelSize));
         Console.out(consoleTag, Console.GREEN, "No smoothing");
 
 
