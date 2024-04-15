@@ -2,6 +2,7 @@ package Tiles.Object;
 
 import Function.Graphics.Color;
 import Function.Math.Point;
+import Function.Math.Random;
 import Tiles.Tile;
 import Tiles.Effect.Fire;
 import System.GameManager;
@@ -22,7 +23,7 @@ public class Torch extends Tile {
 
         // -> Set tile above to fire
         Tile aTile = GameManager.Instance.GetTile(Point.add(tilePoint, Point.up));
-        if(aTile.tileName == "Air"){
+        if(Random.Range(0, 4) == 0 && aTile.tileName == "Air"){
             GameManager.Instance.PlaceTile(Point.add(tilePoint, Point.up), new Fire());
         }
     }
