@@ -3,10 +3,11 @@ package Tiles.Liquid;
 import Function.Math.Point;
 import Tiles.Gas.Air;
 import Tiles.Gas.Steam;
+import Tiles.Solid.Mud;
 import Tiles.Solid.Obsidian;
 import Tiles.Tile;
 import Function.Graphics.Color;
-import System.Program;
+import System.*;
 
 public class Water extends Tile {
 
@@ -15,7 +16,7 @@ public class Water extends Tile {
         tileName = "Water";
         tileColor = new Color(0, 0, 255);
         health = 500;
-        acidity = 1;
+        acidity = 0;
 
         isSolid = false;
         hasGravity = true;
@@ -29,6 +30,16 @@ public class Water extends Tile {
         OnCheckAcid();
 
         CheckObsidian();
+
+        Tile[] tTiles = GameManager.Instance.PullTouchingTiles(tilePoint);
+        for(int i = 0; i < tTiles.length; i++) {
+            if(tTiles[i] == null)
+                continue;
+
+            if(tTiles[i].tileName.equals("Grass")){
+                tTiles[i].OnHurt(1, false);
+            }
+        }
     }
 
     public void CheckObsidian(){

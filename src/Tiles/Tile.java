@@ -6,6 +6,7 @@ import Function.Math.Point;
 import System.Program;
 import Tiles.Effect.Ember;
 import Tiles.Gas.Air;
+import System.*;
 
 public class Tile
 {
@@ -288,6 +289,64 @@ public class Tile
         }
         // -> Sets current position to air
         Program.gm.PlaceTile(tilePoint.X, tilePoint.Y, new Ember());
+    }
+
+    // Checks surrounding tiles
+    public boolean CompareSurrounding(String oName){
+        Point cPos = new Point(0, -1);
+        for(int i = 0; i < 4; i++){
+
+            // -> Get point from list
+            switch(i){
+                case 1:
+                    cPos = new Point(1, 0);
+                    break;
+                case 2:
+                    cPos = new Point(0, 1);
+                    break;
+                case 3:
+                    cPos = new Point(-1, 0);
+                    break;
+                default:
+                    break;
+            }
+            Point uPos = Point.add(cPos, tilePoint);
+            if(!GameManager.Instance.PointInBounds(uPos))
+                continue;
+
+            Tile cTile = Program.gm.GetTile(uPos);
+            if(cTile != null && !cTile.tileName.equals(oName))
+                return false;
+        }
+        return true;
+    }
+    public boolean CheckAdj(String oName){
+        Point cPos = new Point(0, -1);
+        for(int i = 0; i < 4; i++){
+
+            // -> Get point from list
+            switch(i){
+                case 1:
+                    cPos = new Point(1, 0);
+                    break;
+                case 2:
+                    cPos = new Point(0, 1);
+                    break;
+                case 3:
+                    cPos = new Point(-1, 0);
+                    break;
+                default:
+                    break;
+            }
+            Point uPos = Point.add(cPos, tilePoint);
+            if(!GameManager.Instance.PointInBounds(uPos))
+                continue;
+
+            Tile cTile = Program.gm.GetTile(uPos);
+            if(cTile != null && cTile.tileName.equals(oName))
+                return true;
+        }
+        return false;
     }
 
     @Override

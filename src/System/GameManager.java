@@ -6,6 +6,7 @@ import Tiles.*;
 import Tiles.Effect.Fire;
 import Tiles.Gas.Air;
 import Tiles.Gas.Gas;
+import Tiles.Gas.Steam;
 import Tiles.Liquid.Acid;
 import Tiles.Liquid.Lava;
 import Tiles.Liquid.Water;
@@ -151,6 +152,8 @@ public class GameManager
                 return new Fuse();
             case "torch":
                 return new Torch();
+            case "steam":
+                return new Steam();
             default:
                 return new Tile();
         }

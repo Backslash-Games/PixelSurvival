@@ -1,31 +1,30 @@
 package Tiles.Gas;
 
 import Function.Graphics.Color;
-import Function.Math.Random;
 import Tiles.Tile;
 import System.Program;
 
-public class Steam extends Tile {
-    public Steam(){
-        // Attributes
-        tileName = "Steam";
-        tileColor = new Color(181, 181, 181);
-        health = 100;
+public class Cloud extends Tile {
+    public Cloud(){
+        tileName = "Cloud";
+        tileColor = new Color(255, 255, 255);
+        health = 1000;
 
-        // Properties
         deteriorates = true;
         hasGravity = true;
         isSolid = false;
         canFlow = true;
         canFloat = true;
-        density = -2;
+        density = -1;
+        flammable = true;
     }
+
 
     @Override
     public void OnUpdate() {
         super.OnUpdate();
 
         if(CompareSurrounding(tileName))
-            Program.gm.PlaceTile(tilePoint, new Cloud());
+            Program.gm.PlaceTile(tilePoint, new RainCloud());
     }
 }

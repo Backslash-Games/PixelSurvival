@@ -16,7 +16,7 @@ public class Air extends Tile
         stationary = true;
         isSolid = false;
         invulnerable = true;
-        density = -1;
+        density = -100;
     }
 
     public void UpdateAtmosphere() {

@@ -25,7 +25,7 @@ public class Program extends PApplet {
 
     public int selectedPen = 0;
     public String[] penTypes = { "Air", "Godrock", "Sand", "Dirt", "Water", "Grass", "Sapling", "Wood",
-            "Fire", "Lava", "Acid", "Stone", "Bedrock", "Gas", "Fuse", "Torch"};
+            "Fire", "Lava", "Acid", "Stone", "Bedrock", "Gas", "Fuse", "Torch", "Steam"};
 
     public PowderButton[] buttons;
 
