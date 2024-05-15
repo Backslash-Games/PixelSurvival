@@ -22,6 +22,6 @@ public class Dirt extends Soil {
         super.OnUpdate();
 
         if(CheckAdj("Water"))
-            GameManager.Instance.PlaceTile(tilePoint, new Mud());
+            storedChunk.PlaceTile(tilePoint, new Mud());
     }
 }

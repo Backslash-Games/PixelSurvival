@@ -4,10 +4,12 @@ import Debug.Console;
 import Function.Graphics.Color;
 import Function.Graphics.PowderButton;
 import Function.Math.Point;
+import Generation.Structure.Chunk;
 import Tiles.Gas.Air;
 import Tiles.Tile;
 import processing.core.PApplet;
 import processing.core.PImage;
+import processing.event.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +19,12 @@ public class Program extends PApplet {
     public static GameManager gm;
     public static Program instance;
 
-    public static int screenWidth = 1200;
-    public static int screenHeight = 900;
+    public static int screenWidth = 960;
+    public static int screenHeight = 960;
     public static int pixelSize = 5;
 
     public static boolean drawDebug = false;
+    public static boolean drawChunkOutline = true;
 
     public int selectedPen = 0;
     public String[] penTypes = { "Air", "Godrock", "Sand", "Dirt", "Water", "Grass", "Sapling", "Wood",
@@ -29,11 +32,13 @@ public class Program extends PApplet {
 
     public PowderButton[] buttons;
 
-    PImage menuImage;
-    List<Integer> uXvals = new ArrayList<>();
+    public PImage menuImage;
+    public List<Integer> uXvals = new ArrayList<>();
 
     // Console information
-    static String consoleTag = "PROGRAM";
+    public static String consoleTag = "PROGRAM";
+    float zoom = 1;
+
 
     // Sets window settings
     public void settings(){
@@ -41,18 +46,15 @@ public class Program extends PApplet {
 
         // Create game manager - for system information
         gm = new GameManager();
-        int simulationSize = Math.min(gm.sysInfo.screenSize.X, gm.sysInfo.screenSize.Y);
-        int simulationEdgeBuffer = simulationSize / 10;
-        screenWidth = screenHeight = simulationSize - simulationEdgeBuffer;
 
-        Console.out(consoleTag, Console.GREEN, "Width - " + (screenWidth + 500) + " | Height - " + screenHeight);
+        Console.out(consoleTag, Console.GREEN, "Width - " + (screenWidth) + " | Height - " + screenHeight);
         Console.out(consoleTag, Console.GREEN, "Pixel Size - " + pixelSize);
         Console.out(consoleTag, Console.GREEN, "Sim.W - " + (screenWidth / pixelSize) +
                 " | Sim.H - " + (screenHeight / pixelSize));
         Console.out(consoleTag, Console.GREEN, "No smoothing");
 
 
-        size(screenWidth + 500,screenHeight);
+        size(screenWidth,screenHeight);
         pixelWidth = pixelSize;
         noSmooth();
     }
@@ -65,14 +67,6 @@ public class Program extends PApplet {
         instance = this;
 
         menuImage = loadImage("TileDisplay.png");
-
-        // -> Setup buttons
-        buttons = new PowderButton[penTypes.length];
-        int columnSize = 9;
-        for(int i = 0; i < penTypes.length; i++){
-            // -> Get color of tile
-            buttons[i] = new PowderButton((screenWidth + 70) + (130 * (Math.max(0, i / columnSize))), 320 + ((i % columnSize) * 60), 100, 30, i);
-        }
 
         // Put all x into uXvals
         for(int x = 0; x < screenWidth; x += pixelSize) {
@@ -87,15 +81,17 @@ public class Program extends PApplet {
     // Draw the window
     public void draw()
     {
+        if(gm == null)
+            return;
+
         // Update loop
-        if(gm != null)
-            gm.UpdateTiles();
+        gm.Update();
 
 
 
         // Update Atmosphere
         int lowestDirtY = 0;
-        for(int i = 0; i < uXvals.size(); i++){
+        /*for(int i = 0; i < uXvals.size(); i++){
             int x = uXvals.get(i);
 
             Tile cTile;
@@ -118,16 +114,17 @@ public class Program extends PApplet {
                     air.UpdateAtmosphere();
                 }
             }
-        }
+        }*/
         // Set pointer for the x values updated
         uXvals.clear();
 
 
 
         // Draw World
-        for(int x = 0; x < screenWidth; x += pixelSize){
-            for(int y = 0; y < screenHeight; y += pixelSize){
-                Tile cTile = gm.tiles[x / pixelSize][y / pixelSize];
+        stroke(0, 0, 0, 0);
+        for(int x = 0; x < gm.simulatedTiles.length * pixelSize; x += pixelSize){
+            for(int y = 0; y < gm.simulatedTiles[0].length * pixelSize; y += pixelSize){
+                Tile cTile = gm.simulatedTiles[x / pixelSize][y / pixelSize];
 
                 if(drawDebug){
                     if(cTile.updated)
@@ -148,12 +145,24 @@ public class Program extends PApplet {
 
                 if(cTile.updated){
                     rect(x, y, pixelSize, pixelSize);
-                    gm.tiles[x / pixelSize][y / pixelSize].updated = false;
+                    gm.simulatedTiles[x / pixelSize][y / pixelSize].updated = false;
 
                     // -> Check if cTile is stationary
                     if(!uXvals.contains(x) && cTile.isSolid) {
                         uXvals.add(x);
                     }
+                }
+            }
+        }
+        // Draw chunk outline
+        if(drawChunkOutline){
+            stroke(150, 0, 0, 255);
+            fill(0, 0, 0, 0);
+            // Draw square
+            for(int x = 0; x < gm.viewedChunks.length; x++){
+                for(int y = 0; y < gm.viewedChunks[0].length; y++){
+                    rect(x * Chunk.ChunkSize.X * pixelSize, y * Chunk.ChunkSize.Y * pixelSize,
+                            Chunk.ChunkSize.X * pixelSize, Chunk.ChunkSize.Y * pixelSize);
                 }
             }
         }
@@ -163,7 +172,8 @@ public class Program extends PApplet {
 
         // Draw menu image
         image(menuImage, screenWidth, 0, menuImage.width * 10, menuImage.height * 10);
-        Tile hoverTile = gm.GetTile(gm.ScreenToWorld(new Point(mouseX, mouseY)));
+
+        /*Tile hoverTile = gm.generationHandler.currentWorld.GetTile(gm.ScreenToWorld(new Point(mouseX, mouseY)));
         String stateText = "Hovering";
         if(hoverTile == null)
         {
@@ -185,7 +195,7 @@ public class Program extends PApplet {
 
         fill(200, 200, 200);
         textSize(15);
-        text(hoverTile.toString(), screenWidth + 190, 100);
+        text(hoverTile.toString(), screenWidth + 190, 100);*/
 
         // Draw Menu Contents
         int columnSize = 9;
@@ -218,9 +228,12 @@ public class Program extends PApplet {
     @Override
     public void mousePressed() {
         PaintTile();
-        for(int i = 0; i < buttons.length; i++){
-            if(buttons[i].PointInside(new Point(mouseX, mouseY)))
-                buttons[i].OnClicked();
+
+        if(buttons != null) {
+            for (int i = 0; i < buttons.length; i++) {
+                if (buttons[i].PointInside(new Point(mouseX, mouseY)))
+                    buttons[i].OnClicked();
+            }
         }
     }
 
@@ -272,9 +285,37 @@ public class Program extends PApplet {
                 break;
         }
     }
+    @Override
+    public void mouseWheel(MouseEvent event) {
+        if(event.getCount() == -1)
+            SetZoomAmount(zoom - 0.1f);
+        else if(event.getCount() == 1)
+            SetZoomAmount(zoom + 0.1f);
+    }
 
+    // Arguments list
+    // 0 - Game Mode
     public static void main(String[] args) {
-        PApplet.main("System.Program");
+        // Pull mode from args
+        int mode = 0; // default to modeless
+        if(args.length > 0){
+            mode = Integer.parseInt(args[0]);
+        }
+
+        BootMode(mode);
+    }
+    static void BootMode(int mode){
+        switch(mode){
+            case 1: // Fortress Mode
+                PApplet.main("System.Modes.FortressMode");
+                break;
+            case 2: // Sandbox Mode
+                PApplet.main("System.Modes.SandboxMode");
+                break;
+            default: // Modeless
+                PApplet.main("System.Program");
+                break;
+        }
     }
 
 
@@ -286,20 +327,24 @@ public class Program extends PApplet {
     public void PaintTile(){
         // -> Get location of mouse
         Point mousePos = gm.ScreenToWorld(new Point(mouseX, mouseY));
+        // Get hovering chunk
+        Point cLocation = gm.WorldToChunk(mousePos);
+        Chunk wChunk = gm.generationHandler.currentWorld.GetChunk(cLocation);
+        Point localPosition = gm.WorldToLocal(mousePos);
 
         Point pSize = new Point(penSize, penSize);
 
         for(int x = -pSize.X; x <= pSize.X; x++){
             for(int y = -pSize.Y; y <= pSize.Y; y++){
-                Point mPos = Point.add(mousePos, new Point(x, y));
+                Point mPos = Point.add(localPosition, new Point(x, y));
                 Tile pTile = gm.TileFromName(penTypes[selectedPen]);
                 // -> Check if the location is air
-                Tile cTile = gm.GetTile(mPos);
+                Tile cTile = wChunk.GetTile(mPos);
                 if(cTile != null && (cTile.tileName == "Air" || penTypes[selectedPen] == "Air")){
-                    gm.PlaceTile(mPos, pTile);
+                    wChunk.PlaceTile(mPos, pTile);
                 }
                 if(Console.writeDraw)
-                    Console.out(consoleTag, Console.GREEN, "Painting at " + mPos + " | " + mousePos);
+                    Console.out(consoleTag, Console.GREEN, "Painting at mPos: " + mPos + " | mousePosition: " + mousePos + " | localPosition: " + localPosition);
             }
         }
     }
@@ -307,4 +352,15 @@ public class Program extends PApplet {
         selectedPen = (selectedPen + 1) % penTypes.length;
     }
     public void SetPenType(int id) {selectedPen = id;}
+    public void SetZoomAmount(float zoom){
+        // Unusable rn
+        /*
+        if(zoom <= 0)
+            return;
+
+        Console.out(consoleTag, Console.GREEN, "Adjusting zoom: " + zoom);
+
+        rect(screenWidth>>1, screenHeight>>1, zoom, zoom);
+        this.zoom = zoom;*/
+    }
 }

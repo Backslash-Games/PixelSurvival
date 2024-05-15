@@ -22,9 +22,9 @@ public class Torch extends Tile {
         super.OnUpdate();
 
         // -> Set tile above to fire
-        Tile aTile = GameManager.Instance.GetTile(Point.add(tilePoint, Point.up));
+        Tile aTile = storedChunk.GetTile(Point.add(tilePoint, Point.up));
         if(Random.Range(0, 4) == 0 && aTile.tileName == "Air"){
-            GameManager.Instance.PlaceTile(Point.add(tilePoint, Point.up), new Fire());
+            storedChunk.PlaceTile(Point.add(tilePoint, Point.up), new Fire());
         }
     }
 }

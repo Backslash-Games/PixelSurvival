@@ -56,7 +56,7 @@ public class Sapling extends Plant{
 
             // -> Place wood
             Point pulled = unresolvedPoint.remove();
-            Program.gm.PlaceTile(pulled.X + x, pulled.Y, new Wood());
+            storedChunk.PlaceTile(pulled.X + x, pulled.Y, new Wood());
             unresolvedPoint.add(new Point(pulled.X + x, pulled.Y - y));
         }
 
@@ -145,7 +145,7 @@ public class Sapling extends Plant{
         // -> Grow trunk until split
         if(growCount < growClamp.Y) {
             Point pulledPoint = unresolvedPoint.remove();
-            Program.gm.PlaceTile(pulledPoint.X, pulledPoint.Y, new Wood());
+            storedChunk.PlaceTile(pulledPoint.X, pulledPoint.Y, new Wood());
             length++;
 
             // -> Place new point

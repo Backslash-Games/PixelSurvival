@@ -26,6 +26,6 @@ public class Ember extends Tile {
     @Override
     public void Destroy(){
         // -> Sets current position to air
-        Program.gm.PlaceTile(tilePoint.X, tilePoint.Y, new Ash());
+        storedChunk.PlaceTile(tilePoint.X, tilePoint.Y, new Ash());
     }
 }

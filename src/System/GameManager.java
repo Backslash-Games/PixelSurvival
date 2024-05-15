@@ -1,7 +1,10 @@
 package System;
 
+import Debug.Console;
 import Function.Math.Point;
-import Function.Math.Random;
+import Generation.GenerationHandler;
+import Generation.GenerationType;
+import Generation.Structure.World;
 import Tiles.*;
 import Tiles.Effect.Fire;
 import Tiles.Gas.Air;
@@ -14,15 +17,24 @@ import Tiles.Object.Torch;
 import Tiles.Plant.Grass;
 import Tiles.Plant.Sapling;
 import Tiles.Solid.*;
+import Generation.Structure.Chunk;
 
 public class GameManager
 {
-    public Tile[][] tiles;
+    // -> Camera details
+    public Tile[][] simulatedTiles;
+    public Chunk[][] viewedChunks;
+    public Point viewPosition; // in chunk space
+    public Point viewDistance; // in chunk space
+
+
     public int updateTimes = 0;
     public static Information sysInfo = null;
-    boolean paused = false;
+    public boolean paused = false;
 
     public static GameManager Instance = null;
+    public static GenerationHandler generationHandler = null;
+    public String consoleTag = "GAME.MNGR";
 
     public GameManager()
     {
@@ -35,87 +47,26 @@ public class GameManager
         if(sysInfo == null)
             sysInfo = new Information();
 
-        // -> On start it will initialize the game
-        tiles = new Tile[Program.screenWidth / Program.pixelSize][Program.screenHeight / Program.pixelSize];
-
-        FillTiles();
+        // -> On start it will initialize the world
         BuildWorld();
     }
 
-    public void PlaceTile(Point position, Tile tile){
-        PlaceTile(position.X, position.Y, tile);
+
+    // Takes in a world position and returns a chunk location
+    public Point WorldToChunk(Point position){
+        Point worldZero = Point.divide(position, new Point(Chunk.ChunkSize.X, Chunk.ChunkSize.Y));
+        Point rVal = Point.subtract(worldZero, viewDistance);
+        //Console.out(consoleTag, Console.YELLOW, "World to Chunk, value " + rVal);
+        return rVal;
     }
-    public void PlaceTile(int x, int y, Tile tile)
-    {
-        // -> Make sure x & y are in bounds
-        if(x < 0 || y < 0) return;
-        if(x >= tiles.length || y >= tiles[0].length) return;
-
-        // -> Place tile
-        tiles[x][y] = tile;
-        tiles[x][y].SetPosition(new Point(x, y));
-        tiles[x][y].updated = true;
-        tiles[x][y].updatedThisFrame = true;
+    public Point WorldToLocal(Point world){
+        return new Point(world.X % Chunk.ChunkSize.X, world.Y % Chunk.ChunkSize.Y);
     }
-    public void SwapTiles(Point begin, Point end)
-    {
-        // -> Make sure begin and end are in bounds
-        if(begin.X < 0 ||  end.X < 0) return;
-        if(begin.X >= tiles.length || end.Y >= tiles[0].length) return;
-
-        // -> Swap tiles
-        Tile holdTile = tiles[begin.X][begin.Y];
-        PlaceTile(begin.X, begin.Y, tiles[end.X][end.Y]);
-        PlaceTile(end.X, end.Y, holdTile);
-    }
-
-    // N, E, S, W
-    public Tile[] PullTouchingTiles(Point tilePoint){
-        Tile[] returnTiles = new Tile[4];
-
-        returnTiles[0] = GetTile(new Point(tilePoint.X, tilePoint.Y - 1));
-        returnTiles[1] = GetTile(new Point(tilePoint.X + 1, tilePoint.Y));
-        returnTiles[2] = GetTile(new Point(tilePoint.X, tilePoint.Y + 1));
-        returnTiles[3] = GetTile(new Point(tilePoint.X - 1, tilePoint.Y));
-
-        return returnTiles;
-    }
-
-    public void UpdateTiles()
-    {
-        if(paused)
-            return;
-
-        for (int x = 0; x < tiles.length; x++)
-        {
-            for (int y = 0; y < tiles[0].length; y++)
-            {
-                if(tiles[x][y].updatedThisFrame){
-                    tiles[x][y].updatedThisFrame = false;
-                    continue;
-                }
-                tiles[x][y].OnUpdate();
-            }
-        }
-    }
-
-
     public Point ScreenToWorld(Point position){
-        return new Point(Math.max(0, Math.min(Program.screenWidth - 1, position.X / Program.pixelSize)),
+        Point rVal = new Point(Math.max(0, Math.min(Program.screenWidth - 1, position.X / Program.pixelSize)),
                 Math.max(0, Math.min(Program.screenHeight - 1, position.Y / Program.pixelSize)));
-    }
-    public Tile GetTile(Point position){
-        // Make sure point is in position
-        if(!PointInBounds(position))
-            return null;
-        return tiles[position.X][position.Y];
-    }
-    public boolean PointInBounds(Point position){
-        // -> Make sure x & y are in bounds
-        if(position.X < 0 || position.Y < 0) return false;
-        if(position.X >= tiles.length || position.Y >= tiles[0].length) return false;
-
-        return true;
+        //Console.out(consoleTag, Console.YELLOW, "Screen to world, value " + rVal);
+        return rVal;
     }
 
     public Tile TileFromName(String name){
@@ -160,7 +111,8 @@ public class GameManager
     }
 
 
-    void FillTiles()
+    // Might need to move to chunk
+    /*void FillTiles()
     {
         for(int x = 0; x < tiles.length; x++)
         {
@@ -170,54 +122,32 @@ public class GameManager
                 tiles[x][y].updated = true;
             }
         }
-    }
+    }*/
 
-    void BuildDebugRoom()
-    {
-        for(int x = 0; x < tiles.length;  x++)
-        {
-            for(int y = tiles[0].length - 1; y >= tiles[0].length - 10; y--)
-            {
-                PlaceTile(x, y, new Bedrock());
-            }
-        }
-    }
     void BuildWorld()
     {
-        // Set air
-        for(int x = 0; x < tiles.length;  x++) {
-            for(int y = 0; y < tiles[0].length;  y++) {
-                PlaceTile(x, y, new Air());
-            }
-        }
+        Point chunkSize = Chunk.ChunkSize;
 
+        // Handles generation creation
+        if(generationHandler == null)
+            generationHandler = new GenerationHandler();
+        generationHandler.GenerateWorld(new GenerationType(), Point.one);
+    }
+    public void Update(){
+        generationHandler.currentWorld.UpdateChunks();
+        UpdateSimulatedTiles();
+    }
+    void UpdateSimulatedTiles(){
+        for(int x = 0; x < viewedChunks.length; x++){
+            for(int y = 0; y < viewedChunks[0].length; y++){
 
-
-        // Build dirt
-        float height = 0;
-        for(int x = 0; x < tiles.length;  x++)
-        {
-            height += Random.Range(-1000, 1000) / 1000f;
-            int modHeight = Math.round(height);
-
-            int l1 = tiles[0].length - 10 - modHeight;
-            int l2 = tiles[0].length - 25 - (modHeight * 2);
-            int l3 = tiles[0].length - 50 - (modHeight * 3);
-
-            // -> Bedrock
-            for(int y = tiles[0].length - 1; y >= l1; y--)
-                PlaceTile(x, y, new Bedrock());
-            // -> Stone
-            for(int y = l1 - 1; y >= l2; y--)
-                PlaceTile(x, y, new Stone());
-            // -> Dirt
-            for(int y = l2 - 1; y >= l3; y--)
-            {
-                PlaceTile(x, y, new Dirt());
-
-                if(y == l3){
-                    PlaceTile(x, y - 1, new Grass());
+                if(viewedChunks[x][y] == null){
+                    Console.out(Console.ERROR_TAG, Console.RED,
+                            "No chunk found at " + x + ", " + y);
+                    return;
                 }
+
+                viewedChunks[x][y].PushTiles(simulatedTiles, new Point(x, y));
             }
         }
     }

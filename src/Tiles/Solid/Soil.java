@@ -13,13 +13,13 @@ public class Soil extends Tile {
             return;
 
         // -> Check if there is a tile below
-        Tile[][] tiles = Program.gm.tiles;
+        Tile[][] tiles = storedChunk.tiles;
         // --> Make sure tile is in bounds
         if(tilePoint.Y + 1 < tiles[0].length)
         {
             // -> Move down
             if (!tiles[tilePoint.X][tilePoint.Y + 1].isSolid) {
-                Program.gm.SwapTiles(tilePoint, new Point(tilePoint.X, tilePoint.Y + 1));
+                storedChunk.SwapTiles(tilePoint, new Point(tilePoint.X, tilePoint.Y + 1));
                 updated = true;
                 stationary = false;
                 return;
@@ -38,7 +38,7 @@ public class Soil extends Tile {
                 if (tilePoint.X - 1 >= 0 && !tiles[tilePoint.X - 1][tilePoint.Y + 1].isSolid &&
                         (!tiles[tilePoint.X - 1][tilePoint.Y].isSolid || tiles[tilePoint.X][tilePoint.Y + 1].tileName == "Tiles.Solid.Sand")
                         && moveLeft) {
-                    Program.gm.SwapTiles(tilePoint, new Point(tilePoint.X - 1, tilePoint.Y + 1));
+                    storedChunk.SwapTiles(tilePoint, new Point(tilePoint.X - 1, tilePoint.Y + 1));
                     updated = true;
                     stationary = false;
                     return;
@@ -47,7 +47,7 @@ public class Soil extends Tile {
                 if (tilePoint.X + 1 < tiles.length && !tiles[tilePoint.X + 1][tilePoint.Y + 1].isSolid &&
                         (!tiles[tilePoint.X + 1][tilePoint.Y].isSolid || tiles[tilePoint.X][tilePoint.Y + 1].tileName == "Tiles.Solid.Sand")
                         && !moveLeft) {
-                    Program.gm.SwapTiles(tilePoint, new Point(tilePoint.X + 1, tilePoint.Y + 1));
+                    storedChunk.SwapTiles(tilePoint, new Point(tilePoint.X + 1, tilePoint.Y + 1));
                     updated = true;
                     stationary = false;
                     return;

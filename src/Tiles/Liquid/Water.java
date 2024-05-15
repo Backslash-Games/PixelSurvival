@@ -31,7 +31,7 @@ public class Water extends Tile {
 
         CheckObsidian();
 
-        Tile[] tTiles = GameManager.Instance.PullTouchingTiles(tilePoint);
+        Tile[] tTiles = storedChunk.PullTouchingTiles(tilePoint);
         for(int i = 0; i < tTiles.length; i++) {
             if(tTiles[i] == null)
                 continue;
@@ -43,18 +43,18 @@ public class Water extends Tile {
     }
 
     public void CheckObsidian(){
-        Tile[] adjTiles = Program.gm.PullTouchingTiles(tilePoint);
+        Tile[] adjTiles = storedChunk.PullTouchingTiles(tilePoint);
         int tilesHurt = 0;
         for(int i = 3; i < adjTiles.length; i++){
             // Check if tile is null
             if(adjTiles[i] == null || adjTiles[i].tileName != "Lava")
                 continue;
             Point adjPoint = adjTiles[i].tilePoint;
-            Program.gm.PlaceTile(adjPoint.X, adjPoint.Y, new Obsidian());
+            storedChunk.PlaceTile(adjPoint.X, adjPoint.Y, new Obsidian());
             tilesHurt++;
         }
         if(tilesHurt > 0){
-            Program.gm.PlaceTile(tilePoint.X, tilePoint.Y, new Steam());
+            storedChunk.PlaceTile(tilePoint.X, tilePoint.Y, new Steam());
         }
     }
 }

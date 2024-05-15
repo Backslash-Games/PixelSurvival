@@ -25,6 +25,6 @@ public class Cloud extends Tile {
         super.OnUpdate();
 
         if(CompareSurrounding(tileName))
-            Program.gm.PlaceTile(tilePoint, new RainCloud());
+            storedChunk.PlaceTile(tilePoint, new RainCloud());
     }
 }

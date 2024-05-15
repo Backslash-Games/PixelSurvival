@@ -30,15 +30,11 @@ public class Grass extends Plant {
 
     @Override
     public void OnGrow() {
-        // -> Attempt to pull game manager
-        if(Program.gm == null)
-            return;
-
         // -> Hold reference to tiles
-        Tile[][] cTiles = Program.gm.tiles;
+        Tile[][] cTiles = storedChunk.tiles;
 
         // -> Only attempt to grow out if on dirt
-        if(!Program.gm.PointInBounds(new Point(tilePoint.X, tilePoint.Y + 1)))
+        if(!storedChunk.PointInBounds(new Point(tilePoint.X, tilePoint.Y + 1)))
             return;
         if(cTiles[tilePoint.X][tilePoint.Y + 1].tileName != "Dirt")
             return;
@@ -47,47 +43,47 @@ public class Grass extends Plant {
         // --> Check for build up
 
         if(!expanded) {
-            if (Program.gm.PointInBounds(new Point(tilePoint.X - 1, tilePoint.Y - 1))) {
+            if (storedChunk.PointInBounds(new Point(tilePoint.X - 1, tilePoint.Y - 1))) {
                 if (cTiles[tilePoint.X - 1][tilePoint.Y - 1].tileName == "Dirt") {
-                    Program.gm.PlaceTile(tilePoint.X, tilePoint.Y - 1, new Grass());
+                    storedChunk.PlaceTile(tilePoint.X, tilePoint.Y - 1, new Grass());
                 }
             }
-            if (Program.gm.PointInBounds(new Point(tilePoint.X + 1, tilePoint.Y - 1))) {
+            if (storedChunk.PointInBounds(new Point(tilePoint.X + 1, tilePoint.Y - 1))) {
                 if (cTiles[tilePoint.X + 1][tilePoint.Y - 1].tileName == "Dirt") {
-                    Program.gm.PlaceTile(tilePoint.X, tilePoint.Y - 1, new Grass());
+                    storedChunk.PlaceTile(tilePoint.X, tilePoint.Y - 1, new Grass());
                 }
             }
             // --> Check for build up out
-            if (Program.gm.PointInBounds(new Point(tilePoint.X - 1, tilePoint.Y - 1))) {
+            if (storedChunk.PointInBounds(new Point(tilePoint.X - 1, tilePoint.Y - 1))) {
                 if (cTiles[tilePoint.X - 1][tilePoint.Y].tileName == "Dirt" && cTiles[tilePoint.X - 1][tilePoint.Y - 1].tileName == "Tiles.Gas.Air") {
-                    Program.gm.PlaceTile(tilePoint.X - 1, tilePoint.Y - 1, new Grass());
+                    storedChunk.PlaceTile(tilePoint.X - 1, tilePoint.Y - 1, new Grass());
                 }
             }
-            if (Program.gm.PointInBounds(new Point(tilePoint.X + 1, tilePoint.Y - 1))) {
+            if (storedChunk.PointInBounds(new Point(tilePoint.X + 1, tilePoint.Y - 1))) {
                 if (cTiles[tilePoint.X + 1][tilePoint.Y].tileName == "Dirt" && cTiles[tilePoint.X + 1][tilePoint.Y - 1].tileName == "Tiles.Gas.Air") {
-                    Program.gm.PlaceTile(tilePoint.X + 1, tilePoint.Y - 1, new Grass());
+                    storedChunk.PlaceTile(tilePoint.X + 1, tilePoint.Y - 1, new Grass());
                 }
             }
             // --> Check for build out
-            if (Program.gm.PointInBounds(new Point(tilePoint.X - 1, tilePoint.Y + 1))) {
+            if (storedChunk.PointInBounds(new Point(tilePoint.X - 1, tilePoint.Y + 1))) {
                 if (cTiles[tilePoint.X - 1][tilePoint.Y + 1].tileName == "Dirt" && cTiles[tilePoint.X - 1][tilePoint.Y].tileName == "Tiles.Gas.Air") {
-                    Program.gm.PlaceTile(tilePoint.X - 1, tilePoint.Y, new Grass());
+                    storedChunk.PlaceTile(tilePoint.X - 1, tilePoint.Y, new Grass());
                 }
             }
-            if (Program.gm.PointInBounds(new Point(tilePoint.X + 1, tilePoint.Y + 1))) {
+            if (storedChunk.PointInBounds(new Point(tilePoint.X + 1, tilePoint.Y + 1))) {
                 if (cTiles[tilePoint.X + 1][tilePoint.Y + 1].tileName == "Dirt" && cTiles[tilePoint.X + 1][tilePoint.Y].tileName == "Tiles.Gas.Air") {
-                    Program.gm.PlaceTile(tilePoint.X + 1, tilePoint.Y, new Grass());
+                    storedChunk.PlaceTile(tilePoint.X + 1, tilePoint.Y, new Grass());
                 }
             }
             // --> Check for build down out
-            if (Program.gm.PointInBounds(new Point(tilePoint.X - 1, tilePoint.Y + 2))) {
+            if (storedChunk.PointInBounds(new Point(tilePoint.X - 1, tilePoint.Y + 2))) {
                 if (cTiles[tilePoint.X - 1][tilePoint.Y + 2].tileName == "Dirt" && cTiles[tilePoint.X - 1][tilePoint.Y + 1].tileName == "Tiles.Gas.Air") {
-                    Program.gm.PlaceTile(tilePoint.X - 1, tilePoint.Y + 1, new Grass());
+                    storedChunk.PlaceTile(tilePoint.X - 1, tilePoint.Y + 1, new Grass());
                 }
             }
-            if (Program.gm.PointInBounds(new Point(tilePoint.X + 1, tilePoint.Y + 2))) {
+            if (storedChunk.PointInBounds(new Point(tilePoint.X + 1, tilePoint.Y + 2))) {
                 if (cTiles[tilePoint.X + 1][tilePoint.Y + 2].tileName == "Dirt" && cTiles[tilePoint.X + 1][tilePoint.Y + 1].tileName == "Tiles.Gas.Air") {
-                    Program.gm.PlaceTile(tilePoint.X + 1, tilePoint.Y + 1, new Grass());
+                    storedChunk.PlaceTile(tilePoint.X + 1, tilePoint.Y + 1, new Grass());
                 }
             }
             expanded = true;
@@ -99,9 +95,9 @@ public class Grass extends Plant {
                 Plant grassExp = new Grass();
                 grassExp.canGrow = false;
                 Point currentPoint = new Point(tilePoint.X, tilePoint.Y - i);
-                if(Program.gm.PointInBounds(currentPoint)){
-                    if(!Program.gm.GetTile(currentPoint).isSolid){
-                        Program.gm.PlaceTile(tilePoint.X, tilePoint.Y - i, grassExp);
+                if(storedChunk.PointInBounds(currentPoint)){
+                    if(!storedChunk.GetTile(currentPoint).isSolid){
+                        storedChunk.PlaceTile(tilePoint.X, tilePoint.Y - i, grassExp);
                     }
                 }
             }
@@ -109,9 +105,9 @@ public class Grass extends Plant {
                 Plant grassExp = new Grass();
                 grassExp.canGrow = false;
                 Point currentPoint = new Point(tilePoint.X, tilePoint.Y + i);
-                if(Program.gm.PointInBounds(currentPoint)){
-                    if(Program.gm.GetTile(currentPoint).tileName == "Dirt"){
-                        Program.gm.PlaceTile(tilePoint.X, tilePoint.Y + i, grassExp);
+                if(storedChunk.PointInBounds(currentPoint)){
+                    if(storedChunk.GetTile(currentPoint).tileName == "Dirt"){
+                        storedChunk.PlaceTile(tilePoint.X, tilePoint.Y + i, grassExp);
                     }
                 }
             }

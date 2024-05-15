@@ -28,9 +28,9 @@ public class RainCloud extends Tile {
         super.OnUpdate();
 
         // -> Set tile below to water
-        Tile aTile = GameManager.Instance.GetTile(Point.add(tilePoint, Point.down));
+        Tile aTile = storedChunk.GetTile(Point.add(tilePoint, Point.down));
         if(Random.Range(0, 10) == 0 && aTile.tileName == "Air"){
-            GameManager.Instance.PlaceTile(Point.add(tilePoint, Point.down), new Water());
+            storedChunk.PlaceTile(Point.add(tilePoint, Point.down), new Water());
         }
     }
 }

@@ -26,6 +26,6 @@ public class Steam extends Tile {
         super.OnUpdate();
 
         if(CompareSurrounding(tileName))
-            Program.gm.PlaceTile(tilePoint, new Cloud());
+            storedChunk.PlaceTile(tilePoint, new Cloud());
     }
 }

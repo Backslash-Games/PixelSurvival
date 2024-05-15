@@ -24,6 +24,6 @@ public class Gas extends Tile {
     @Override
     public void Destroy(){
         // -> Sets current position to air
-        Program.gm.PlaceTile(tilePoint.X, tilePoint.Y, new Fire());
+        storedChunk.PlaceTile(tilePoint.X, tilePoint.Y, new Fire());
     }
 }

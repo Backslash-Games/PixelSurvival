@@ -7,9 +7,11 @@ import System.Program;
 import Tiles.Effect.Ember;
 import Tiles.Gas.Air;
 import System.*;
+import Generation.Structure.Chunk;
 
 public class Tile
 {
+    public Chunk storedChunk = null;
 
     // -> Processing <-
     public boolean updated = false;
@@ -66,19 +68,32 @@ public class Tile
         Point newPoint = new Point(tilePoint.X, tilePoint.Y + gravityDir);
 
         // -> Check if there is a tile below
-        Tile[][] tiles = Program.gm.tiles;
+        Tile[][] tiles = storedChunk.tiles;
+        Tile compTile = null;
+        int adjFlag = -1;
         // --> Make sure tile is in bounds
-        if(Program.gm.PointInBounds(newPoint))
+        if(storedChunk.PointInBounds(newPoint)) // Checks for a movement within chunk
         {
-            // -> Move in direction of gravity
-            if ((CheckCollision(tiles[newPoint.X][newPoint.Y]) || CheckPassThrough(tiles[newPoint.X][newPoint.Y].tileName)) && tiles[newPoint.X][newPoint.Y].tileName != tileName) {
-                Program.gm.SwapTiles(tilePoint, new Point(tilePoint.X, tilePoint.Y + gravityDir));
-                updated = true;
-                stationary = false;
-                return;
-            }
+            compTile = tiles[newPoint.X][newPoint.Y];
         }
-        stationary = true;
+        else if((adjFlag = storedChunk.PointAdjDir(newPoint)) != -1)
+        {
+            newPoint = storedChunk.PointInAdj(newPoint);
+            compTile = storedChunk.adjacentChunks[adjFlag].tiles[newPoint.X][newPoint.Y];
+        }
+
+        // Check if the comp tile is still null
+        if(compTile == null){
+            stationary = true;
+            return;
+        }
+
+        // -> Move in direction of gravity
+        if ((CheckCollision(compTile) || CheckPassThrough(compTile.tileName)) && compTile.tileName != tileName) {
+            storedChunk.SwapTiles(tilePoint, newPoint, adjFlag);
+            updated = true;
+            stationary = false;
+        }
     }
 
     // Wiggles back and forth
@@ -95,7 +110,7 @@ public class Tile
         Random rand = new Random();
 
         // Check if the tile can flow
-        Tile[] touchingTiles = Program.gm.PullTouchingTiles(tilePoint);
+        Tile[] touchingTiles = storedChunk.PullTouchingTiles(tilePoint);
         boolean touchingAir = false;
         for(int i = 0; i < touchingTiles.length; i++){
             if(touchingTiles[i] == null)
@@ -117,7 +132,7 @@ public class Tile
         while(!tileFoundR && rDist < 500){
             // Check next tile
             checkPos = Point.add(checkPos, new Point(checkDir.X, 0));
-            Tile cTile = Program.gm.GetTile(checkPos);
+            Tile cTile = storedChunk.GetTile(checkPos);
             // Check if the tile is solid
             if(cTile == null)
                 break;
@@ -126,7 +141,7 @@ public class Tile
 
             // Check if the vertical tile is available to move to
             Point vertPos = Point.add(checkPos, new Point(0, checkDir.Y));
-            cTile = Program.gm.GetTile(vertPos);
+            cTile = storedChunk.GetTile(vertPos);
             if(cTile == null)
                 break;
             if(cTile.tileName == "Air")
@@ -143,7 +158,7 @@ public class Tile
         while(!tileFoundL && lDist < 500){
             // Check next tile
             checkPos = Point.add(checkPos, new Point(checkDir.X, 0));
-            Tile cTile = Program.gm.GetTile(checkPos);
+            Tile cTile = storedChunk.GetTile(checkPos);
             // Check if the tile is solid
             if(cTile == null)
                 break;
@@ -152,7 +167,7 @@ public class Tile
 
             // Check if the vertical tile is available to move to
             Point vertPos = Point.add(checkPos, new Point(0, checkDir.Y));
-            cTile = Program.gm.GetTile(vertPos);
+            cTile = storedChunk.GetTile(vertPos);
             if(cTile == null)
                 break;
             if(cTile.tileName == "Air")
@@ -162,7 +177,7 @@ public class Tile
         }
 
         // If no direction is found, randomize
-        Tile[][] tiles = Program.gm.tiles;
+        Tile[][] tiles = storedChunk.tiles;
         boolean moveLeft = rand.nextBoolean();
         if(tileFoundR || tileFoundL){
             // Go for best direction
@@ -178,7 +193,7 @@ public class Tile
             // Move left
             if (tilePoint.X - 1 >= 0 && !tiles[tilePoint.X - 1][tilePoint.Y].isSolid &&
                     tiles[tilePoint.X - 1][tilePoint.Y].tileName != tileName && moveLeft) {
-                Program.gm.SwapTiles(tilePoint, new Point(tilePoint.X - 1, tilePoint.Y));
+                storedChunk.SwapTiles(tilePoint, new Point(tilePoint.X - 1, tilePoint.Y));
                 updated = true;
                 stationary = false;
                 return;
@@ -186,7 +201,7 @@ public class Tile
             // Move right
             if (tilePoint.X + 1 < tiles.length && !tiles[tilePoint.X + 1][tilePoint.Y].isSolid &&
                     tiles[tilePoint.X + 1][tilePoint.Y].tileName != tileName && !moveLeft) {
-                Program.gm.SwapTiles(tilePoint, new Point(tilePoint.X + 1, tilePoint.Y));
+                storedChunk.SwapTiles(tilePoint, new Point(tilePoint.X + 1, tilePoint.Y));
                 updated = true;
                 stationary = false;
                 return;
@@ -213,7 +228,7 @@ public class Tile
         if(!flammable)
             return;
 
-        Tile[] adjTiles = Program.gm.PullTouchingTiles(tilePoint);
+        Tile[] adjTiles = storedChunk.PullTouchingTiles(tilePoint);
         for(int i = 0; i < adjTiles.length; i++){
             // Check if tile is null
             if(adjTiles[i] == null)
@@ -230,7 +245,7 @@ public class Tile
         if(acidity <= 0)
             return;
 
-        Tile[] adjTiles = Program.gm.PullTouchingTiles(tilePoint);
+        Tile[] adjTiles = storedChunk.PullTouchingTiles(tilePoint);
         int tilesHurt = 0;
         for(int i = 0; i < adjTiles.length; i++){
             // Check if tile is null
@@ -280,7 +295,7 @@ public class Tile
     // -> Destroys tile
     public void Destroy(){
         // -> Sets current position to air
-        Program.gm.PlaceTile(tilePoint.X, tilePoint.Y, new Air());
+        storedChunk.PlaceTile(tilePoint.X, tilePoint.Y, new Air());
     }
     public void Destroy(boolean burning){
         if(!burning) {
@@ -288,7 +303,7 @@ public class Tile
             return;
         }
         // -> Sets current position to air
-        Program.gm.PlaceTile(tilePoint.X, tilePoint.Y, new Ember());
+        storedChunk.PlaceTile(tilePoint.X, tilePoint.Y, new Ember());
     }
 
     // Checks surrounding tiles
@@ -311,10 +326,10 @@ public class Tile
                     break;
             }
             Point uPos = Point.add(cPos, tilePoint);
-            if(!GameManager.Instance.PointInBounds(uPos))
+            if(!storedChunk.PointInBounds(uPos))
                 continue;
 
-            Tile cTile = Program.gm.GetTile(uPos);
+            Tile cTile = storedChunk.GetTile(uPos);
             if(cTile != null && !cTile.tileName.equals(oName))
                 return false;
         }
@@ -339,10 +354,10 @@ public class Tile
                     break;
             }
             Point uPos = Point.add(cPos, tilePoint);
-            if(!GameManager.Instance.PointInBounds(uPos))
+            if(!storedChunk.PointInBounds(uPos))
                 continue;
 
-            Tile cTile = Program.gm.GetTile(uPos);
+            Tile cTile = storedChunk.GetTile(uPos);
             if(cTile != null && cTile.tileName.equals(oName))
                 return true;
         }
