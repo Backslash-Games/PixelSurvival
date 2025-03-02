@@ -28,25 +28,24 @@ public class Soil extends Tile {
         boolean moveLeft = rand.nextBoolean();
 
         while(movementCheck < 2) {
-            // -> Move left
-            if (tilePoint.X - 1 >= 0 && !tiles[tilePoint.X - 1][tilePoint.Y + 1].isSolid &&
-                    (!tiles[tilePoint.X - 1][tilePoint.Y].isSolid || tiles[tilePoint.X][tilePoint.Y + 1].tileName == "Tiles.Solid.Sand")
-                    && moveLeft) {
-                //storedChunk.SwapTiles(tilePoint, new Point(tilePoint.X - 1, tilePoint.Y + 1));
+            // Move left
+            if (moveLeft) {
+                oTile = storedChunk.GetTile(new Point(tilePoint.X - 1, tilePoint.Y));
+            }
+            else{
+                oTile = storedChunk.GetTile(new Point(tilePoint.X + 1, tilePoint.Y));
+            }
+
+            if(oTile == null)
+                return;
+
+            if(!oTile.isSolid && !oTile.tileName.equals(tileName)) {
+                storedChunk.SwapTiles(this, oTile);
                 updated = true;
                 stationary = false;
+                moved = true;
                 return;
             }
-            // -> Move Right
-            if (tilePoint.X + 1 < tiles.length && !tiles[tilePoint.X + 1][tilePoint.Y + 1].isSolid &&
-                    (!tiles[tilePoint.X + 1][tilePoint.Y].isSolid || tiles[tilePoint.X][tilePoint.Y + 1].tileName == "Tiles.Solid.Sand")
-                    && !moveLeft) {
-                //storedChunk.SwapTiles(tilePoint, new Point(tilePoint.X + 1, tilePoint.Y + 1));
-                updated = true;
-                stationary = false;
-                return;
-            }
-            moveLeft = !moveLeft;
             movementCheck++;
         }
         stationary = true;
