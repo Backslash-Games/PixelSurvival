@@ -204,6 +204,11 @@ public class Program extends PApplet {
                 // -> Draw a rectangle
                 fill(255, 0, 0, 140);
                 rect((screenWidth + 70) + (130 * (Math.max(0, i / columnSize))), 320 + ((i % columnSize) * 60), 100, 30);
+
+                fill(0, 0, 0, 255);
+                rect(0, 0, 100, 25);
+                fill(255, 255, 255, 255);
+                text(penTypes[i], (int)(screenWidth * 0.005f), (int)(screenHeight * 0.02f));
             }
 
             // -> Get color of tile

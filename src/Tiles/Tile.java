@@ -19,6 +19,7 @@ public class Tile implements Cloneable
     public boolean updated = false;
     public boolean updatedThisFrame = false;
     public boolean stationary = false;
+    public boolean moved = false;
 
     // -> Attributes <-
     public String tileName = "Powder";
@@ -52,11 +53,15 @@ public class Tile implements Cloneable
 
         OnCheckBurn();
         OnCheckAcid();
+
+        moved = false;
     }
 
     // Moves pixel vertically
     public void OnGravity()
     {
+        if(moved)
+            return;
         if(!hasGravity)
             return;
 
@@ -80,13 +85,14 @@ public class Tile implements Cloneable
             Console.out(consoleTag, Console.PURPLE, "Found tile is null");
             return;
         }
-        Console.out(consoleTag, Console.PURPLE, "Found tile at " + nTile.tilePoint + " (Grabbing with " + newPoint + ")");
+        //Console.out(consoleTag, Console.PURPLE, "Found tile at " + nTile.tilePoint + " (Grabbing with " + newPoint + ")");
         // -> Move in direction of gravity
         if ((CheckCollision(nTile) || CheckPassThrough(nTile.tileName)) && nTile.tileName != tileName) {
-            Console.out(consoleTag, Console.PURPLE, "Swapping positions F:" + tilePoint + " S:" + nTile.tilePoint);
+            //Console.out(consoleTag, Console.PURPLE, "Swapping positions F:" + tilePoint + " S:" + nTile.tilePoint);
             storedChunk.SwapTiles(this, nTile);
             updated = true;
             stationary = false;
+            moved = true;
         }
     }
     public void OLD_OnGravity()
@@ -136,6 +142,8 @@ public class Tile implements Cloneable
 
     // Wiggles back and forth
     public void OnFlow(){
+        if(moved)
+            return;
         if(!canFlow)
             return;
 
@@ -228,22 +236,26 @@ public class Tile implements Cloneable
         // Move tile
         int moveChecks = 0;
         while(moveChecks < 2) {
+            Tile oTile = null;
             // Move left
-            if (tilePoint.X - 1 >= 0 && !tiles[tilePoint.X - 1][tilePoint.Y].isSolid &&
-                    tiles[tilePoint.X - 1][tilePoint.Y].tileName != tileName && moveLeft) {
-                //storedChunk.SwapTiles(tilePoint, new Point(tilePoint.X - 1, tilePoint.Y));
+            if (moveLeft) {
+                oTile = storedChunk.GetTile(new Point(tilePoint.X - 1, tilePoint.Y));
+            }
+            else{
+                oTile = storedChunk.GetTile(new Point(tilePoint.X + 1, tilePoint.Y));
+            }
+
+            if(oTile == null)
+                return;
+
+            if(!oTile.isSolid && !oTile.tileName.equals(tileName)) {
+                storedChunk.SwapTiles(this, oTile);
                 updated = true;
                 stationary = false;
+                moved = true;
                 return;
             }
-            // Move right
-            if (tilePoint.X + 1 < tiles.length && !tiles[tilePoint.X + 1][tilePoint.Y].isSolid &&
-                    tiles[tilePoint.X + 1][tilePoint.Y].tileName != tileName && !moveLeft) {
-                //storedChunk.SwapTiles(tilePoint, new Point(tilePoint.X + 1, tilePoint.Y));
-                updated = true;
-                stationary = false;
-                return;
-            }
+
             stationary = true;
             moveChecks++;
         }

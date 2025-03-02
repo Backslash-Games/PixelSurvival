@@ -83,14 +83,24 @@ public class Chunk {
     }
     public void PlaceTile(int x, int y, Tile tile)
     {
+        PlaceTile(x, y, tile, false);
+    }
+    public void PlaceTile(int x, int y, Tile tile, boolean cloneTile)
+    {
         // -> Make sure x & y are in bounds
         if(x < 0 || y < 0) return;
         if(x >= tiles.length || y >= tiles[0].length) return;
 
-        Console.out(consoleTag, Console.BLUE, "Placing " + tile.tileName + " at " + tile.tilePoint);
+        //Console.out(consoleTag, Console.BLUE, "Placing " + tile.tileName + " at " + tile.tilePoint);
 
         // -> Place tile
-        tiles[x][y] = tile;
+        try{
+            tiles[x][y] = (Tile) tile.clone();
+        }
+        catch (Exception e)
+        {
+            Console.out(consoleTag, Console.RED, "!!! UNABLE TO PLACE TILE !!!");
+        }
         tiles[x][y].storedChunk = this;
         tiles[x][y].SetPosition(new Point(x, y));
         tiles[x][y].updated = true;
@@ -98,25 +108,19 @@ public class Chunk {
     }
     public void SwapTiles(Tile first, Tile second) {
         // -> Swap tiles
-        Console.out(consoleTag, Console.BLUE, "Swapping positions F:" + first.tilePoint + " S:" + second.tilePoint);
+        //Console.out(consoleTag, Console.BLUE, "Swapping positions F:" + first.tilePoint + " S:" + second.tilePoint);
         // Try to hold the tile
-        Tile hTile = null;
-        try {
-            hTile = (Tile) second.clone();
-        }
-        catch (Exception e) { return; }
-
-        first.storedChunk.PlaceTile(first.tilePoint.X, first.tilePoint.Y, second);
-        second.storedChunk.PlaceTile(second.tilePoint.X, second.tilePoint.Y, hTile);
+        first.storedChunk.PlaceTile(first.tilePoint.X, first.tilePoint.Y, second, true);
+        second.storedChunk.PlaceTile(second.tilePoint.X, second.tilePoint.Y, first, false);
     }
 
 
     public Tile GetTile(Point position){
         // Make sure point is in position
-        Console.out(consoleTag, Console.BLUE, "Attempting grab at " + position);
+        //Console.out(consoleTag, Console.BLUE, "Attempting grab at " + position);
         if(!PointInBounds(position)){
             // -> Chek ADJ chunks
-            Console.out(consoleTag, Console.BLUE, "Attempting grab in adj chunk");
+            //Console.out(consoleTag, Console.BLUE, "Attempting grab in adj chunk");
             int dir = PointAdjDir(position);
             if(dir == -1)
                 return null;
@@ -127,7 +131,7 @@ public class Chunk {
             return adjChunk.GetTile(position);
         }
         Tile rTile = tiles[position.X][position.Y];
-        Console.out(consoleTag, Console.BLUE, "Found tile in chunk at " + rTile.tilePoint);
+        //Console.out(consoleTag, Console.BLUE, "Found tile in chunk at " + rTile.tilePoint);
         return rTile;
     }
     public Tile GetTile(Point position, int adjFlag){

@@ -40,6 +40,8 @@ public class Water extends Tile {
                 tTiles[i].OnHurt(1, false);
             }
         }
+
+        moved = false;
     }
 
     public void CheckObsidian(){
