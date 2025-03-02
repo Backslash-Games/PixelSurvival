@@ -87,6 +87,8 @@ public class Chunk {
         if(x < 0 || y < 0) return;
         if(x >= tiles.length || y >= tiles[0].length) return;
 
+        Console.out(consoleTag, Console.BLUE, "Placing " + tile.tileName + " at " + tile.tilePoint);
+
         // -> Place tile
         tiles[x][y] = tile;
         tiles[x][y].storedChunk = this;
@@ -94,46 +96,42 @@ public class Chunk {
         tiles[x][y].updated = true;
         tiles[x][y].updatedThisFrame = true;
     }
-
-
-    public void SwapTiles(Point begin, Point end, int adjFlag){
-        // Default case
-        if(adjFlag == -1) {
-            // -> Make sure begin and end are in bounds
-            if (begin.X < 0 || end.X < 0) return;
-            if (begin.X >= tiles.length || end.Y >= tiles[0].length) return;
-
-            // -> Swap tiles
-            Tile holdTile = tiles[begin.X][begin.Y];
-            PlaceTile(begin.X, begin.Y, tiles[end.X][end.Y]);
-            PlaceTile(end.X, end.Y, holdTile);
+    public void SwapTiles(Tile first, Tile second) {
+        // -> Swap tiles
+        Console.out(consoleTag, Console.BLUE, "Swapping positions F:" + first.tilePoint + " S:" + second.tilePoint);
+        // Try to hold the tile
+        Tile hTile = null;
+        try {
+            hTile = (Tile) second.clone();
         }
-        else// Based under the assumption that END is in another chunk
-        // Start assumed to be current chunk
-        {
-            Chunk oChunk = adjacentChunks[adjFlag];
-            if(!oChunk.PointInBounds(end)){
-                end = PointInAdj(end);
-            }
+        catch (Exception e) { return; }
 
-            // -> Swap tiles
-            Tile startTile = tiles[begin.X][begin.Y];
-            Tile endTile = oChunk.GetTile(end);
-            PlaceTile(begin.X, begin.Y, endTile);
-            oChunk.PlaceTile(end.X, end.Y, startTile);
-        }
-    }
-    public void SwapTiles(Point begin, Point end)
-    {
-        SwapTiles(begin, end, -1);
+        first.storedChunk.PlaceTile(first.tilePoint.X, first.tilePoint.Y, second);
+        second.storedChunk.PlaceTile(second.tilePoint.X, second.tilePoint.Y, hTile);
     }
 
 
     public Tile GetTile(Point position){
         // Make sure point is in position
-        if(!PointInBounds(position))
-            return null;
-        return tiles[position.X][position.Y];
+        Console.out(consoleTag, Console.BLUE, "Attempting grab at " + position);
+        if(!PointInBounds(position)){
+            // -> Chek ADJ chunks
+            Console.out(consoleTag, Console.BLUE, "Attempting grab in adj chunk");
+            int dir = PointAdjDir(position);
+            if(dir == -1)
+                return null;
+
+            // -> Get tile
+            Chunk adjChunk = adjacentChunks[dir];
+            position = PointInAdj(position);
+            return adjChunk.GetTile(position);
+        }
+        Tile rTile = tiles[position.X][position.Y];
+        Console.out(consoleTag, Console.BLUE, "Found tile in chunk at " + rTile.tilePoint);
+        return rTile;
+    }
+    public Tile GetTile(Point position, int adjFlag){
+        return null;
     }
     // N, E, S, W
     public Tile[] PullTouchingTiles(Point tilePoint){

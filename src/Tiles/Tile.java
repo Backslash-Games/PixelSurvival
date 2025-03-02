@@ -1,6 +1,8 @@
 package Tiles;
 
 import java.util.Random;
+
+import Debug.Console;
 import Function.Graphics.Color;
 import Function.Math.Point;
 import System.Program;
@@ -9,7 +11,7 @@ import Tiles.Gas.Air;
 import System.*;
 import Generation.Structure.Chunk;
 
-public class Tile
+public class Tile implements Cloneable
 {
     public Chunk storedChunk = null;
 
@@ -38,6 +40,8 @@ public class Tile
     public boolean invulnerable = false;
     public int density = 1;
 
+    public String consoleTag = "Tile";
+
 
     // -> Events
     public void OnUpdate()
@@ -54,6 +58,40 @@ public class Tile
     public void OnGravity()
     {
         if(!hasGravity)
+            return;
+
+        // -> Make sure game manager is set
+        if (Program.gm == null)
+            return;
+
+        // Shows gravity direction
+        int gravityDir = 1;
+        if(canFloat)
+            gravityDir = -1;
+        // Pulls reference to new point
+        Point newPoint = new Point(tilePoint.X, tilePoint.Y + gravityDir);
+
+        // -> Check if there is a tile below
+        //Tile[][] tiles = storedChunk.tiles;
+        Tile nTile = storedChunk.GetTile(newPoint);
+        // Check if the comp tile is still null
+        if(nTile == null){
+            stationary = true;
+            Console.out(consoleTag, Console.PURPLE, "Found tile is null");
+            return;
+        }
+        Console.out(consoleTag, Console.PURPLE, "Found tile at " + nTile.tilePoint + " (Grabbing with " + newPoint + ")");
+        // -> Move in direction of gravity
+        if ((CheckCollision(nTile) || CheckPassThrough(nTile.tileName)) && nTile.tileName != tileName) {
+            Console.out(consoleTag, Console.PURPLE, "Swapping positions F:" + tilePoint + " S:" + nTile.tilePoint);
+            storedChunk.SwapTiles(this, nTile);
+            updated = true;
+            stationary = false;
+        }
+    }
+    public void OLD_OnGravity()
+    {
+        /*if(!hasGravity)
             return;
 
         // -> Make sure game manager is set
@@ -93,7 +131,7 @@ public class Tile
             storedChunk.SwapTiles(tilePoint, newPoint, adjFlag);
             updated = true;
             stationary = false;
-        }
+        }*/
     }
 
     // Wiggles back and forth
@@ -193,7 +231,7 @@ public class Tile
             // Move left
             if (tilePoint.X - 1 >= 0 && !tiles[tilePoint.X - 1][tilePoint.Y].isSolid &&
                     tiles[tilePoint.X - 1][tilePoint.Y].tileName != tileName && moveLeft) {
-                storedChunk.SwapTiles(tilePoint, new Point(tilePoint.X - 1, tilePoint.Y));
+                //storedChunk.SwapTiles(tilePoint, new Point(tilePoint.X - 1, tilePoint.Y));
                 updated = true;
                 stationary = false;
                 return;
@@ -201,7 +239,7 @@ public class Tile
             // Move right
             if (tilePoint.X + 1 < tiles.length && !tiles[tilePoint.X + 1][tilePoint.Y].isSolid &&
                     tiles[tilePoint.X + 1][tilePoint.Y].tileName != tileName && !moveLeft) {
-                storedChunk.SwapTiles(tilePoint, new Point(tilePoint.X + 1, tilePoint.Y));
+                //storedChunk.SwapTiles(tilePoint, new Point(tilePoint.X + 1, tilePoint.Y));
                 updated = true;
                 stationary = false;
                 return;
@@ -375,5 +413,12 @@ public class Tile
                 "\nLife: " + health + " (" + deteriorates + ")" +
                 "\nDensity: " + density +
                 "\nAcidity: " + acidity;
+    }
+
+    // Overriding the clone() method
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        // Returning a clone of the current object
+        return super.clone();
     }
 }

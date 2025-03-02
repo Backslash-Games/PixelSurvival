@@ -246,12 +246,15 @@ public class Program extends PApplet {
     public void keyPressed() {
         if(Console.writeKeypress)
             Console.out("INPUT", Console.RED, "Key pressed '" + key + "'");
+        // Cycle Pen
         if(key == ' '){
             CyclePenType();
         }
+        // Pause
         if(key == 'q' && gm != null){
             gm.TogglePlaytime();
         }
+        // Pen size
         switch (key){
             case '1':
                 ChangePenSize(0);
